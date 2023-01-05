@@ -9,7 +9,7 @@ class Layer {
  public:
   Layer();
   int FindMaximum();
-  // void PrintLayer();
+  void PrintLayer();
 
   void SetCountNeuron(int count_neuron);
   void SetCountWeightNeuron(int count_weight_neuron);

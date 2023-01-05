@@ -1,5 +1,5 @@
-#ifndef SRC_MODEL_GRAPHPERCEPTRON_H_
-#define SRC_MODEL_GRAPHPERCEPTRON_H_
+#ifndef GRAPH_H
+#define GRAPH_H
 
 #include <locale.h>
 

@@ -1,5 +1,5 @@
-#ifndef SRC_MODEL_COMMON_H_
-#define SRC_MODEL_COMMON_H_
+#ifndef COMMON_H
+#define COMMON_H
 
 #include <atomic>
 #include <cmath>
@@ -82,5 +82,5 @@ class Common {
   std::vector<double> metrics{};
 };
 
-}  // namespace s21
-#endif  // SRC_MODEL_COMMON_H_
+}
+#endif  

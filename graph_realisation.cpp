@@ -1,8 +1,8 @@
-#include "graph_perceptron.h"
+#include "graph.h"
 
-namespace s21 {
+namespace s21 
+{
 
-//_____________________Create_And_Init_GraphPerceptron_____________________//
 GraphPerceptron::GraphPerceptron() : GraphPerceptron(2) {}
 
 GraphPerceptron::GraphPerceptron(int count_hidden_layers) : count_hidden_layers_(count_hidden_layers) 
@@ -35,7 +35,6 @@ void GraphPerceptron::GenerateWeightNeuron()
     layers_[i].SetWeightsNeuron();
 }
 
-//_______________________________Parse_File________________________________//
 void GraphPerceptron::LoadValuesTrain(std::string const &filename_train) 
 {
   LoadFile(filename_train);
@@ -47,8 +46,6 @@ void GraphPerceptron::LoadValuesTest(std::string const &filename_test)
   LoadFile(filename_test);
   vector_for_test = GetVector();
 }
-
-//__________________________________Train__________________________________//
 
 void GraphPerceptron::EpochTrain(int epoch, std::vector<double> *report_graph) 
 {
@@ -75,7 +72,6 @@ void GraphPerceptron::TrainForthBack(int d)
   BackwardPropagation();
 }
 
-//___________________________ForwardPropagation____________________________//
 void GraphPerceptron::ForwardPropagation() 
 {
   for (size_t l = 1; l < count_layers_ && this->stop_train_or_test_ == false; l++) 
@@ -90,7 +86,6 @@ void GraphPerceptron::ForwardPropagation()
   }
 }
 
-//___________________________BackwardPropagation___________________________//
 void GraphPerceptron::BackwardPropagation() 
 {
   for (size_t l = number_out_layer_; l != 0 && this->stop_train_or_test_ == false; l--) 
@@ -129,7 +124,6 @@ void GraphPerceptron::WeightsCalculation(int l, int n, double delta_weight)
   }
 }
 
-//____________________________Save_Load_Weights____________________________//
 
 void GraphPerceptron::SaveWeights(std::string save_new_weights) 
 {
@@ -188,7 +182,7 @@ void GraphPerceptron::LoadWeights(std::string const &filename_weights)
   }
   inweights.close();
 }
-//_________________________________Predict_________________________________//
+
 
 std::vector<int> GraphPerceptron::Predict(std::string name_image) 
 {
@@ -228,7 +222,6 @@ std::vector<int> GraphPerceptron::FindMaximumPredict()
   return index_max;
 }
 
-//_______________________________Test__________________________________//
 void GraphPerceptron::Test(int test_sample) 
 {
   percent_progress_ = 0;
@@ -279,7 +272,6 @@ void GraphPerceptron::Testing(char *filename_test)
   Test(full_sample);
 }
 
-//__________________ResizePerceptron___________________//
 void GraphPerceptron::Clear() 
 {
   for (size_t i = 0; i < count_layers_; i++)
@@ -323,7 +315,6 @@ void GraphPerceptron::PrintPerceptron()
   {
     std::cout << "Скрытый слой [" << i + 1 << "]: " << "\n";
     layers_[i + 1].PrintLayer();
-
     std::cout << "\n";
   }
 
