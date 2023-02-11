@@ -15,18 +15,18 @@ GraphPerceptron::GraphPerceptron(int count_hidden_layers) : count_hidden_layers_
 
 void GraphPerceptron::InitGraphPerceptron() 
 {
-  layers_[0].SetCountNeuron(neuron_in);
+  layers_[0].SetCountNeuron(inNeuronsNb);
 
-  layers_[1].SetCountNeuron(neuron_hidden);
-  layers_[1].SetCountWeightNeuron(neuron_in);
+  layers_[1].SetCountNeuron(hiddenNeuronsNb);
+  layers_[1].SetCountWeightNeuron(inNeuronsNb);
 
   for (size_t i = 2; i < number_out_layer_; i++) 
   {
-    layers_[i].SetCountNeuron(neuron_hidden);
-    layers_[i].SetCountWeightNeuron(neuron_hidden);
+    layers_[i].SetCountNeuron(hiddenNeuronsNb);
+    layers_[i].SetCountWeightNeuron(hiddenNeuronsNb);
   }
-  layers_[number_out_layer_].SetCountNeuron(neuron_out);
-  layers_[number_out_layer_].SetCountWeightNeuron(neuron_hidden);
+  layers_[number_out_layer_].SetCountNeuron(outNeuronsNb);
+  layers_[number_out_layer_].SetCountWeightNeuron(hiddenNeuronsNb);
 }
 
 void GraphPerceptron::GenerateWeightNeuron() 
@@ -35,28 +35,29 @@ void GraphPerceptron::GenerateWeightNeuron()
     layers_[i].SetWeightsNeuron();
 }
 
-void GraphPerceptron::LoadValuesTrain(std::string const &filename_train) 
+int GraphPerceptron::LoadValuesTrain(std::string const &filename_train)
 {
-  LoadFile(filename_train);
-  vector_vectorovi4 = GetVector();
+  if (getDataFromFile(filename_train) < 0) return -1;
+  vector_vectorovi4 = GetInput();
+  return 1;
 }
 
-void GraphPerceptron::LoadValuesTest(std::string const &filename_test) 
+int GraphPerceptron::LoadValuesTest(std::string const &filename_test)
 {
-  LoadFile(filename_test);
-  vector_for_test = GetVector();
+  if (getDataFromFile(filename_test) < 0) return -1;
+  vector_for_test = GetInput();
+  return 1;
 }
 
 void GraphPerceptron::EpochTrain(int epoch, std::vector<double> *report_graph) 
 {
-  percent_progress_ = 0;
   size_letter_for_epoch = epoch * (int)vector_vectorovi4.size();
   for (int k = 0; k < epoch; k++) 
   {
-    for (size_t d = 0; d < vector_vectorovi4.size() && this->stop_train_or_test_ == false; d++) 
+    _rightPredicts = 0;
+    for (size_t d = 0; d < vector_vectorovi4.size(); d++)
     {
       TrainForthBack(d);
-      percent_progress_ = CalculateProgressPercent(d, k);
     }
     report_graph->push_back(100 - (CalculatePercentTrain() * 100));
   }
@@ -64,7 +65,7 @@ void GraphPerceptron::EpochTrain(int epoch, std::vector<double> *report_graph)
 
 void GraphPerceptron::TrainForthBack(int d) 
 {
-  letter_to_learn_ = vector_vectorovi4[d][0] - 1;
+  _expectedLetter = vector_vectorovi4[d][0] - 1;
   for (size_t i = 1; i < vector_vectorovi4[d].size(); i++) 
     layers_[0].SetNeuronValue(i, vector_vectorovi4[d][i] / 255);
   ForwardPropagation();
@@ -74,28 +75,28 @@ void GraphPerceptron::TrainForthBack(int d)
 
 void GraphPerceptron::ForwardPropagation() 
 {
-  for (size_t l = 1; l < count_layers_ && this->stop_train_or_test_ == false; l++) 
+  for (size_t l = 1; l < count_layers_; l++)
     {
      for (size_t n = 0; n < layers_[l].GetCountNeuron(); n++) 
      {
       double sum = 0;
       for (size_t w = 0; w < layers_[l - 1].GetCountNeuron(); w++) 
         sum += layers_[l - 1].GetNeuronValue(w) * layers_[l].GetWeightNeuron(n, w);
-      layers_[l].SetNeuronValue(n + 1, SigmoidFunction(sum));
+      layers_[l].SetNeuronValue(n + 1, sigmoid(sum));
     }
   }
 }
 
 void GraphPerceptron::BackwardPropagation() 
 {
-  for (size_t l = number_out_layer_; l != 0 && this->stop_train_or_test_ == false; l--) 
+  for (size_t l = number_out_layer_; l != 0; l--)
   {
     for (size_t n = 0; n < layers_[l].GetCountNeuron(); n++) 
     {
       double error = 0;
       if (l == number_out_layer_) 
       {
-        if (n == letter_to_learn_) 
+        if (n == _expectedLetter)
           error = layers_[number_out_layer_].GetNeuronValue(n) - 1;
         else 
           error = layers_[number_out_layer_].GetNeuronValue(n);
@@ -107,10 +108,11 @@ void GraphPerceptron::BackwardPropagation()
       }
       layers_[l].SetNeuronError(n, error);
 
-      double delta_weight = error * SigmoidDerivative(layers_[l].GetNeuronValue(n));
+      double delta_weight = error * df_sigmoid(layers_[l].GetNeuronValue(n));
 
       layers_[l].SetNeuronDeltaWeight(n, delta_weight);
-      WeightsCalculation(l, n, delta_weight);
+      if (std::abs(delta_weight) - 0.00001 > 0)
+        WeightsCalculation(l, n, delta_weight);
     }
   }
 }
@@ -119,17 +121,17 @@ void GraphPerceptron::WeightsCalculation(int l, int n, double delta_weight)
 {
   for (size_t w = 0; w < layers_[l - 1].GetCountNeuron(); w++) 
   {
-    double new_weight = layers_[l].GetWeightNeuron(n, w) - layers_[l - 1].GetNeuronValue(w) * delta_weight * learning_rate;
+    double new_weight = layers_[l].GetWeightNeuron(n, w) - layers_[l - 1].GetNeuronValue(w) * delta_weight * LerningStep;
     layers_[l].SetNeuronWeights(n, w, new_weight);
   }
 }
 
 
-void GraphPerceptron::SaveWeights(std::string save_new_weights) 
+void GraphPerceptron::SaveWeights(const std::string &saveFile)
 {
   std::fstream outweights;
 
-  outweights.open(save_new_weights, std::ios::out);
+  outweights.open(saveFile, std::ios::out);
 
   if (!outweights) 
   {
@@ -148,10 +150,10 @@ void GraphPerceptron::SaveWeights(std::string save_new_weights)
   outweights.close();
 }
 
-void GraphPerceptron::LoadWeights(std::string const &filename_weights) 
+void GraphPerceptron::LoadWeights(std::string const &filename_weights)
 {
   std::ifstream inweights(filename_weights, std::ios::in);
-  if (!inweights.bad()) 
+  if (!inweights.bad() && inweights.is_open())
   {
     std::string line;
 
@@ -160,7 +162,7 @@ void GraphPerceptron::LoadWeights(std::string const &filename_weights)
       size_t i = 0;
       char *ptrEnd;
 
-      if (isdigit(line[i])) 
+      if (isdigit(line[i]) || line[i] == '-')
       {
         for (size_t l = 1; l < count_layers_; l++) 
         {
@@ -186,8 +188,8 @@ void GraphPerceptron::LoadWeights(std::string const &filename_weights)
 
 std::vector<int> GraphPerceptron::Predict(std::string name_image) 
 {
-  LoadValuesTest(name_image);
-  Test(full_sample);
+//  LoadValuesTest(name_image);
+  Test(1);
   return FindMaximumPredict();
 }
 
@@ -222,24 +224,26 @@ std::vector<int> GraphPerceptron::FindMaximumPredict()
   return index_max;
 }
 
-void GraphPerceptron::Test(int test_sample) 
+void GraphPerceptron::Test(double test_sample)
 {
-  percent_progress_ = 0;
-  successful_find_letter_ = 0;
+  auto start = std::chrono::steady_clock::now();
+  _rightPredicts = 0;
   size_letter_for_epoch =
-      (int)vector_for_test.size() * test_sample / full_sample;
-  for (size_t d = 0; d < (size_t)size_letter_for_epoch && this->stop_train_or_test_ == false; d++) 
+      (int)((double)vector_for_test.size() * test_sample);
+  for (size_t d = 0; d < (size_t)size_letter_for_epoch; d++)
   {
     TestForthBack(d);
-    percent_progress_ = CalculateProgressPercent(d, 0);
   }
-  CalculatePercent(1);
+  auto end = std::chrono::steady_clock::now();
+  auto diff = end - start;
+  _time = std::chrono::duration <double> (diff).count();
+  std::cout << CalculatePercent(1) << std::endl;
 }
 
 void GraphPerceptron::TestForthBack(int d) 
 {
-  letter_to_learn_ = vector_for_test[d][0] - 1;
-  for (size_t n = 1; n < vector_for_test[d].size() && this->stop_train_or_test_ == false; n++) 
+  _expectedLetter = vector_for_test[d][0] - 1;
+  for (size_t n = 1; n < vector_for_test[d].size(); n++)
     layers_[0].SetNeuronValue(n, vector_for_test[d][n] / 255);
   ForwardPropagation();
   CountingSuccessfulLetters();
@@ -247,14 +251,14 @@ void GraphPerceptron::TestForthBack(int d)
 
 double GraphPerceptron::CalculatePercent(int k_group) 
 {
-  return successful_find_letter_ / (double)vector_for_test.size() / k_group;
+  return _rightPredicts / ((double)vector_for_test.size() / k_group);
 }
 
 void GraphPerceptron::CountingSuccessfulLetters() 
 {
-  if ((size_t)layers_[number_out_layer_].FindMaximum() == letter_to_learn_) 
+  if ((size_t)layers_[number_out_layer_].FindMaximum() == _expectedLetter)
   {
-    successful_find_letter_++;
+    _rightPredicts++;
     true_positive += 1;
     true_negative += 25;
   } 
@@ -268,7 +272,7 @@ void GraphPerceptron::CountingSuccessfulLetters()
 
 void GraphPerceptron::Testing(char *filename_test) 
 {
-  LoadValuesTest(filename_test);
+  if (LoadValuesTest(filename_test) < 0) return;
   Test(full_sample);
 }
 
@@ -284,8 +288,8 @@ void GraphPerceptron::Clear()
     vector_for_test[d].clear();
   vector_for_test.clear();
 
-  successful_find_letter_ = 0;
-  letter_to_learn_ = 0;
+  _rightPredicts = 0;
+  _expectedLetter = 0;
   count_hidden_layers_ = 0;
   count_layers_ = 0;
   number_out_layer_ = 0;
@@ -299,6 +303,31 @@ void GraphPerceptron::ResizePerceptron(int count_hidden_layers)
   number_out_layer_ = count_layers_ - 1;
   layers_.resize(count_layers_);
   InitGraphPerceptron();
+}
+
+void GraphPerceptron::CrossValidation(std::string filename_train, int k_validation) {
+  _k = k_validation;
+  if (getDataFromFile(filename_train) < 0) return;
+  vector_vectorovi4 = GetInput();
+  vector_for_test = GetInput();
+  size_letter_for_epoch = k_validation * (int)vector_vectorovi4.size();
+  int one_part = vector_vectorovi4.size() / _k;
+
+  for (int k_count = 1; k_count <= _k; k_count++) {
+    for (int k_inner = 1; k_inner <= _k; k_inner++) {
+      if (k_inner == k_count) k_inner++;
+      for (int d = one_part * (k_inner - 1);
+           k_inner <= _k && d < (one_part * k_inner);
+           d++) {
+        TrainForthBack(d);
+      }
+    }
+	_rightPredicts = 0;
+    for (int d = one_part * (k_count - 1); d < (one_part * k_count); d++)
+      TestForthBack(d);
+    std::cout << CalculatePercent(_k) << std::endl;
+//    if (k_count < _k) GenerateWeightNeuron(); // что это?
+  }
 }
 
 void GraphPerceptron::PrintPerceptron() 

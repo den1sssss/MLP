@@ -77,18 +77,18 @@ void s21::Layer::ClearFunction() {
   count_weight_neuron_ = 0;
 }
 
-// void s21::Layer::PrintLayer() {
-//   std::cout << "  Количество нейронов    " << count_neuron_ << "\n";
-//   std::cout << "\n";
+ void s21::Layer::PrintLayer() {
+   std::cout << "  Количество нейронов    " << count_neuron_ << "\n";
+   std::cout << "\n";
 
-//   for (size_t i = 0; i < count_neuron_; i++) {  // Сколько нейронов вывести
-//     std::cout << "    Нейрон [" << i + 1 << "]: "
-//               << "\n";
+   for (size_t i = 0; i < count_neuron_; i++) {  // Сколько нейронов вывести
+     std::cout << "    Нейрон [" << i + 1 << "]: "
+               << "\n";
 //     layer_[i].PrintNeuron();
-//   }
+   }
 
-//   // std::cout << "    Нейрон [" << count_neuron_ << "]: "  // Последний
-//   нейрон
-//   //           << "\n";
-//   // layer_[count_neuron_ - 1].PrintNeuron();
-// }
+   // std::cout << "    Нейрон [" << count_neuron_ << "]: "  // Последний
+
+   //           << "\n";
+   // layer_[count_neuron_ - 1].PrintNeuron();
+ }
