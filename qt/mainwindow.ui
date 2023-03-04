@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>988</width>
+    <height>669</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,10 +17,10 @@
    <widget class="Form" name="widget" native="true">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>421</width>
-      <height>341</height>
+      <x>10</x>
+      <y>10</y>
+      <width>451</width>
+      <height>361</height>
      </rect>
     </property>
    </widget>
@@ -28,7 +28,7 @@
     <property name="geometry">
      <rect>
       <x>170</x>
-      <y>370</y>
+      <y>390</y>
       <width>131</width>
       <height>41</height>
      </rect>
@@ -47,8 +47,8 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>470</x>
-      <y>110</y>
+      <x>70</x>
+      <y>430</y>
       <width>271</width>
       <height>141</height>
      </rect>
@@ -66,8 +66,8 @@
    <widget class="QRadioButton" name="radioButton">
     <property name="geometry">
      <rect>
-      <x>560</x>
-      <y>330</y>
+      <x>340</x>
+      <y>480</y>
       <width>89</width>
       <height>31</height>
      </rect>
@@ -75,12 +75,15 @@
     <property name="text">
      <string>Draw</string>
     </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QRadioButton" name="radioButton_2">
     <property name="geometry">
      <rect>
-      <x>560</x>
-      <y>360</y>
+      <x>340</x>
+      <y>520</y>
       <width>89</width>
       <height>20</height>
      </rect>
@@ -92,14 +95,76 @@
    <widget class="QPushButton" name="pushButton_2">
     <property name="geometry">
      <rect>
-      <x>660</x>
-      <y>360</y>
+      <x>440</x>
+      <y>520</y>
       <width>71</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>обзор</string>
+     <string>Browse</string>
+    </property>
+   </widget>
+   <widget class="QSlider" name="horizontalSlider">
+    <property name="geometry">
+     <rect>
+      <x>740</x>
+      <y>360</y>
+      <width>151</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>890</x>
+      <y>360</y>
+      <width>49</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="spinBox">
+    <property name="geometry">
+     <rect>
+      <x>570</x>
+      <y>390</y>
+      <width>51</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Yu Gothic UI Semibold</family>
+      <pointsize>22</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <property name="buttonSymbols">
+     <enum>QAbstractSpinBox::PlusMinus</enum>
+    </property>
+   </widget>
+   <widget class="QCustomPlot" name="widget_2" native="true">
+    <property name="geometry">
+     <rect>
+      <x>540</x>
+      <y>20</y>
+      <width>431</width>
+      <height>321</height>
+     </rect>
     </property>
    </widget>
   </widget>
@@ -108,7 +173,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>988</width>
      <height>22</height>
     </rect>
    </property>
@@ -120,6 +185,12 @@
    <class>Form</class>
    <extends>QWidget</extends>
    <header>form.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QCustomPlot</class>
+   <extends>QWidget</extends>
+   <header location="global">qcustomplot.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

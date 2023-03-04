@@ -22,7 +22,8 @@ class Form : public QWidget
 public:
     explicit Form(QWidget *parent = nullptr);
     ~Form();
-    std::vector<double> Pixels;
+    std::vector<double> Pixels_draw;
+    std::vector<double> Pixels_file;
 
 private:
     Ui::Form *ui;

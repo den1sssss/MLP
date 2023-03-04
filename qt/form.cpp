@@ -27,7 +27,7 @@ void Form::resizeEvent(QResizeEvent *) {
     if (newRect != m_pixmap.rect()){
         QPixmap newPixmap{newRect.size()};
         QPainter painter{&newPixmap};
-        painter.fillRect(newPixmap.rect(), Qt::green);
+        painter.fillRect(newPixmap.rect(), QColor(188, 190, 251));
         painter.drawPixmap(5, 5, m_pixmap);
         m_pixmap = newPixmap;
     }
@@ -54,7 +54,7 @@ void Form::clearWindow() {
     update();
     //auto newRect = m_pixmap.rect().united(rect());
         //QPixmap newPixmap{rect().size()};
-    painter.fillRect(m_pixmap.rect(), Qt::green);
+    painter.fillRect(m_pixmap.rect(), QColor(188, 190, 251));
     painter.drawPixmap(5, 5, m_pixmap);
         //m_pixmap = newPixmap;
 }
@@ -63,12 +63,12 @@ void Form::draw(const QPoint &pos) {
     QPainter painter{&m_pixmap};
     //painter.setRenderHint(QPainter::Antialiasing);
     QPen pen;
-    pen.setWidth(30.0);
+    pen.setWidth(20.0);
     pen.setColor(Qt::black);
     pen.setCapStyle(Qt::FlatCap);
     pen.joinStyle();
     painter.setPen(pen);
-    painter.drawEllipse(m_lastPos, 10, 10);
+    painter.drawEllipse(m_lastPos, 5, 5);
 
     m_lastPos = pos;
     update();
@@ -88,14 +88,11 @@ void Form::SavePixels() {
         qt_blurImage(&painter, img, 4, true, false);
     }
 
-    Pixels.clear();
-    Pixels.push_back(-1);
+    Pixels_draw.push_back(-1);
     for (int i = pxDst.toImage().size().width() - 1; i >= 0; i--) {
         for (int j = 0; j < pxDst.toImage().size().height(); j++) {
-            Pixels.push_back(pxDst.toImage().pixelColor(j, i).black());
+            Pixels_draw.push_back(pxDst.toImage().pixelColor(j, i).black());
         }
     }
-//    for (size_t i = 0; i < Pixels.size(); ++i)
-//        std::cout << Pixels[i] << ",";
-//    std::cout << std::endl;
+
 }

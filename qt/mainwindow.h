@@ -2,7 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "/Users/ddurrand/Desktop/MLLP/src/control/Control.hpp" // относительный путь будет
+#include <QSlider>
+#include <qcustomplot.h>
+#include <QIcon>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -15,12 +17,15 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    double xvalue;
 public Q_SLOTS:
     void handleButton();
     void bmp_file_dialog();
+    void selectDrawMode();
+    void selectFileMode();
+    void changeValueOfSlider();
 
 private:
     Ui::MainWindow *ui;
-    s21::Control _cont;
 };
 #endif // MAINWINDOW_H

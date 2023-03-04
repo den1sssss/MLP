@@ -1,36 +1,60 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <qframe.h>
 
 void MainWindow::handleButton()
 {
-    if (!(ui->widget->Pixels.empty()))
+    if (!(ui->widget->Pixels_draw.empty()) && ui->radioButton->isChecked())
     {
         //QMessageBox::about(this,"test output", QString::number(ui->widget->Pixels[1]));//здесь нужно вызвать функцию распознавания
-//        for (size_t i = 0; i < ui->widget->Pixels.size(); ++i)
-//            std::cout << ui->widget->Pixels[i] << ",";
-//        std::cout << std::endl;
+        ui->label->setText("This is A");
+        ui->widget->Pixels_draw.clear();
+    }
 
-        std::vector<int> results = _cont.predict(ui->widget->Pixels);
-        std::cout << (char)(results[0] + 'A') << std::endl;
-        std::cout << (char)(results[1] + 'A')  << std::endl;
-        std::cout << (char)(results[2] + 'A')  << std::endl;
-        std::cout << (char)(results[3] + 'A')  << std::endl;
-        std::cout << std::endl;
-//        QString a;
-//        a[0] = QChar('A' + results[0]);
-//        ui->label->setText(a);
-    ui->widget->Pixels.clear();
+    if (!(ui->widget->Pixels_file.empty()) && ui->radioButton_2->isChecked())
+    {
+        //QMessageBox::about(this,"test output", QString::number(ui->widget->Pixels[1]));//здесь нужно вызвать функцию распознавания
+        ui->label->setText("This is B");
+        ui->widget->Pixels_file.clear();
     }
 }
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-{   
+{
     ui->setupUi(this);
+    this->setWindowIcon(QIcon(":/images/Perceptron-or-task.png"));
+    ui->pushButton_2->setEnabled(false);
     connect(ui->pushButton, SIGNAL (clicked()), this, SLOT (handleButton()));
     connect(ui->pushButton_2, SIGNAL (clicked()), this, SLOT (bmp_file_dialog()));
+    connect(ui->radioButton, SIGNAL (clicked()), this, SLOT (selectDrawMode()));
+    connect(ui->radioButton_2, SIGNAL (clicked()), this, SLOT (selectFileMode()));
+    connect(ui->horizontalSlider, SIGNAL (sliderMoved(int)), this, SLOT(changeValueOfSlider()));
+    ui->horizontalSlider->setRange(0,101);
+    xvalue = ui->horizontalSlider->value();
+    //QLabel *label = new QLabel(this);
+    ui->label_2->setText(QString::number(xvalue/100));
+    QVector<double> x(101), y(101); // initialize with entries 0..100
+    for (int i=0; i<101; ++i)
+    {
+      x[i] = i/50.0 - 1; // x goes from -1 to 1
+      y[i] = x[i]*x[i]; // let's plot a quadratic function
+    }
+    ui->widget_2->addGraph();
+    ui->widget_2->graph(0)->addData(x,y);
+    ui->widget_2->xAxis->setLabel("EPOCH");
+    ui->widget_2->yAxis->setLabel("ERROR VALUE");
+    ui->widget_2->yAxis->setRange(*std::min_element(y.begin(), y.end()),*std::max_element(y.begin(), y.end()));
+    ui->widget_2->xAxis->setRange(0,*std::max_element(x.begin(), x.end()));
+    ui->widget_2->setBackground(QColor(190, 251, 188));
+    //ui->widget_2->replot();
+    //ui->widget_2->setBackground(Color::yellow)
+}
+
+void MainWindow::changeValueOfSlider()
+{
+    xvalue = ui->horizontalSlider->value();
+    ui->label_2->setText(QString::number(xvalue/100));
 }
 
 void MainWindow::bmp_file_dialog() {
@@ -46,27 +70,31 @@ void MainWindow::bmp_file_dialog() {
                            "Выберите квадратное изображение .bmp не меньше "
                            "28x28 и не больше 512x512");
     } else {
+        ui->widget->Pixels_file.clear();
+        ui->widget->setEnabled(false);
         img = img.scaled(28, 28);
         img = img.transformed(QTransform().rotate(-90));
 
-        ui->widget->Pixels.push_back(-1);
+        ui->widget->Pixels_file.push_back(15);
         for (int i = img.size().width() - 1; i >= 0; i--) {
             for (int j = 0; j < img.size().height(); j++) {
-                ui->widget->Pixels.push_back(img.pixelColor(j, i).black());
+                ui->widget->Pixels_file.push_back(img.pixelColor(j, i).black());
             }
         }
     }
-    for (size_t i = 0; i < ui->widget->Pixels.size(); ++i)
-        std::cout << ui->widget->Pixels[i] << ",";
-    std::cout << std::endl;
-
-    std::vector<int> results = _cont.predict(ui->widget->Pixels);
-    std::cout << results[0] << std::endl;
-    std::cout << results[1] << std::endl;
-    std::cout << results[2] << std::endl;
-    std::cout << results[3] << std::endl;
 }
 
+void MainWindow::selectDrawMode()
+{
+    ui->widget->setEnabled(true);
+    ui->pushButton_2->setEnabled(false);
+}
+
+void MainWindow::selectFileMode()
+{
+    ui->widget->setEnabled(false);
+    ui->pushButton_2->setEnabled(true);
+}
 
 MainWindow::~MainWindow()
 {
