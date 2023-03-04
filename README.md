@@ -2,7 +2,6 @@
 
 Implementation of a basic multilayer perceptron.
 
-The russian version of the task can be found in the repository.
 
 
 ## Contents
